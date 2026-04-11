@@ -17,12 +17,20 @@ Replace this paragraph with your own summary of what your version does.
 
 ## How The System Works
 
-Real-world platforms like Spotify and YouTube usually use hybrid recommenders that combine collaborative filtering (patterns from similar users) with content-based filtering (item features like genre, mood, and audio traits), then rank results by predicted satisfaction. In this simulation, we will prioritize a **content-based** approach because it is transparent and easy to test: each song is scored by how closely its features match a user taste profile, and the top-scoring songs are recommended.
+Real-world platforms like Spotify and YouTube usually use hybrid recommenders that combine collaborative filtering (patterns from similar users) with content-based filtering (item features like genre, mood, and audio traits), then rank results by predicted satisfaction. In this simulation, we prioritize a **content-based** approach because it is transparent and easy to test: each song is scored by how closely its features match a user taste profile, and the top-scoring songs are recommended.
 
-Our simulation uses these features:
+Our finalized Algorithm Recipe is:
 
-- Song features: `genre`, `mood`, `energy`, `tempo_bpm`, `valence`, `danceability`, `acousticness`.
-- UserProfile features: `preferred_genre`, `preferred_mood`, `target_energy`, `target_tempo_bpm`, `target_valence`, `target_danceability`, `target_acousticness`, plus optional feature weights to control how strongly each feature affects the score.
+1. Read the user preferences and one song from the CSV.
+2. Give points for an exact **genre** match.
+3. Give slightly more points for an exact **mood** match, since mood often describes the listener’s immediate vibe.
+4. Add smaller points for audio features that are close to the user’s targets, such as `energy`, `tempo_bpm`, `valence`, `danceability`, and `acousticness`.
+5. Add a small bonus when the user likes acoustic music and the song has high acousticness.
+6. Sum the points, rank all songs by score, and return the top 5 recommendations.
+
+This balance keeps genre important without letting it overpower everything else. A song that matches the mood and energy well should still be able to rank above a song that only matches the genre.
+
+Potential bias note: this system might over-prioritize genre if the genre weight is too high, which could cause it to ignore great songs that better match the user’s mood or energy. Because the catalog is also small, underrepresented genres or moods may appear less often in the final recommendations.
 
 ---
 
