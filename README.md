@@ -17,17 +17,12 @@ Replace this paragraph with your own summary of what your version does.
 
 ## How The System Works
 
-Explain your design in plain language.
+Real-world platforms like Spotify and YouTube usually use hybrid recommenders that combine collaborative filtering (patterns from similar users) with content-based filtering (item features like genre, mood, and audio traits), then rank results by predicted satisfaction. In this simulation, we will prioritize a **content-based** approach because it is transparent and easy to test: each song is scored by how closely its features match a user taste profile, and the top-scoring songs are recommended.
 
-Some prompts to answer:
+Our simulation uses these features:
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
-
-You can include a simple diagram or bullet list if helpful.
+- Song features: `genre`, `mood`, `energy`, `tempo_bpm`, `valence`, `danceability`, `acousticness`.
+- UserProfile features: `preferred_genre`, `preferred_mood`, `target_energy`, `target_tempo_bpm`, `target_valence`, `target_danceability`, `target_acousticness`, plus optional feature weights to control how strongly each feature affects the score.
 
 ---
 
