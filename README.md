@@ -57,6 +57,10 @@ pip install -r requirements.txt
 python -m src.main
 ```
 
+### Output Sample
+
+![Terminal output sample](images/Screenshot%202026-04-11%20at%207.30.46%E2%80%AFPM.png)
+
 ### Running Tests
 
 Run the starter tests with:
