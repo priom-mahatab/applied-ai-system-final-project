@@ -75,25 +75,31 @@ You can add more tests in `tests/test_recommender.py`.
 
 ## Experiments You Tried
 
-Use this section to document the experiments you ran. For example:
+I tested a range of user profiles, including standard profiles (`High-Energy Pop`, `Chill Lofi`, `Deep Intense Rock`) and adversarial profiles (`Conflicting Pop Sad`, `Genre Synonym Typo`, `Mood Synonym Mismatch`, `Empty Categorical`, `Missing Fields`, and out-of-range energy values).
 
-- What happened when you changed the weight on genre from 2.0 to 0.5
-- What happened when you added tempo or valence to the score
-- How did your system behave for different types of users
+Key observations from experiments:
+
+- Clear profiles gave intuitive results: `High-Energy Pop` surfaced songs like **Sunrise City**, while `Chill Lofi` surfaced **Library Rain** and **Midnight Coding**.
+- Conflicting preferences revealed tradeoffs: in `Conflicting Pop Sad`, mood matching often failed but songs like **Gym Hero** still ranked high because genre and energy were strong.
+- Text sensitivity mattered: `hip-hop` did not match `hip hop`, so genre points were lost even when user intent was basically the same.
+- Missing or blank fields (`Missing Fields`, `Empty Categorical`) produced very similar outputs, showing fallback behavior driven mostly by default energy.
+- Invalid input behavior was exposed: non-numeric energy (for example, `"very high"`) raised a `ValueError`.
+
+These tests helped verify where the model behaves well and where it is brittle.
 
 ---
 
 ## Limitations and Risks
 
-Summarize some limitations of your recommender.
+This recommender has several limitations and risks:
 
-Examples:
+- Small catalog risk: with only 18 songs, recommendations can repeat and may not reflect broad real-world tastes.
+- Exact-label risk: genre and mood use exact text matching, so small wording changes (like `hip-hop` vs `hip hop`) can unfairly reduce score.
+- Energy-dominance risk: high energy closeness can push songs upward even when other preferences are weak, which can cause repeated songs like **Gym Hero** to appear across multiple profiles.
+- Cold-start/default risk: users with missing preferences are funneled into generic mid-energy recommendations rather than personalized results.
+- Input robustness risk: invalid energy strings can crash scoring unless handled upstream.
 
-- It only works on a tiny catalog
-- It does not understand lyrics or language
-- It might over favor one genre or mood
-
-You will go deeper on this in your model card.
+Because of these limits, this model should be treated as a transparent classroom simulation, not a production recommendation system.
 
 ---
 
