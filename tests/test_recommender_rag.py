@@ -5,7 +5,7 @@ Tests for the RAG pipeline components:
   - embedder.py
   - vector_store.py
   - retriever.py
-  - parse_query() from app.py
+  - query_parser.py
 
 Run unit tests only (no Ollama needed):
     pytest -m "not integration"
@@ -181,61 +181,18 @@ class TestRetriever:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# PARSE_QUERY TESTS (from app.py)
+# PARSE_QUERY TESTS
 # ══════════════════════════════════════════════════════════════════════════════
 
 class TestParseQuery:
+    """
+    Tests for query_parser.parse_query().
 
-    def _import_parse_query(self):
-        """
-        Safely import parse_query from app.py without triggering Streamlit
-        or any Ollama/embedder calls.
+    parse_query lives in its own module (query_parser.py) with no Streamlit
+    dependency, so these tests import it directly — no app.py gymnastics needed.
+    """
 
-        Fixes applied:
-          1. Full MagicMock for streamlit — auto-handles every st.* attribute.
-          2. st.cache_resource overridden so decorators pass functions through.
-          3. st.columns overridden to return the correct number of MagicMocks
-             based on the argument (int → that many, list → len of list).
-          4. recommender.load_songs stubbed → startup() returns [] immediately.
-          5. vector_store.build_index stubbed → never calls embed_song.
-          Both stubs are restored in finally so other tests are unaffected.
-        """
-        import importlib
-        import recommender
-        import vector_store
-
-        # Full MagicMock — auto-handles any st.* attribute app.py accesses
-        st_mock = MagicMock()
-
-        # Decorator must pass the function through unchanged
-        st_mock.cache_resource = lambda **kw: (lambda f: f)
-
-        # columns() must return a real list of the right length so tuple
-        # unpacking works: col1, col2 = st.columns([1,5])  →  needs 2
-        #                  cols = st.columns(3)             →  needs 3
-        st_mock.columns = lambda spec, **kw: [
-            MagicMock() for _ in range(spec if isinstance(spec, int) else len(spec))
-        ]
-
-        sys.modules["streamlit"] = st_mock
-
-        # Stub load_songs so startup() returns [] and never touches embed_song
-        original_load_songs = recommender.load_songs
-        recommender.load_songs = lambda *a, **kw: []
-
-        # Stub build_index so it never calls embed_song even if called
-        original_build_index = vector_store.build_index
-        vector_store.build_index = lambda *a, **kw: None
-
-        try:
-            import app
-            importlib.reload(app)
-            return app.parse_query
-        finally:
-            recommender.load_songs = original_load_songs
-            vector_store.build_index = original_build_index
-
-    @patch("requests.post")
+    @patch("query_parser.requests.post")
     def test_parse_query_returns_required_keys(self, mock_post):
         """parse_query should always return genre, mood, and energy keys."""
         mock_post.return_value = MagicMock(
@@ -244,14 +201,14 @@ class TestParseQuery:
                 "message": {"content": '{"genre": "lofi", "mood": "chill", "energy": 0.35}'}
             },
         )
-        parse_query = self._import_parse_query()
+        from query_parser import parse_query
         result = parse_query("chill lofi for late night coding")
 
         assert "genre" in result
         assert "mood" in result
         assert "energy" in result
 
-    @patch("requests.post")
+    @patch("query_parser.requests.post")
     def test_parse_query_energy_is_float(self, mock_post):
         """parse_query should return energy as a float."""
         mock_post.return_value = MagicMock(
@@ -260,22 +217,22 @@ class TestParseQuery:
                 "message": {"content": '{"genre": "pop", "mood": "happy", "energy": 0.85}'}
             },
         )
-        parse_query = self._import_parse_query()
+        from query_parser import parse_query
         result = parse_query("upbeat happy pop")
 
         assert isinstance(result["energy"], float)
 
-    @patch("requests.post", side_effect=Exception("Ollama down"))
+    @patch("query_parser.requests.post", side_effect=Exception("Ollama down"))
     def test_parse_query_falls_back_on_error(self, mock_post):
         """parse_query should return safe defaults if Ollama is unreachable."""
-        parse_query = self._import_parse_query()
+        from query_parser import parse_query
         result = parse_query("some query")
 
         assert result["genre"] == ""
         assert result["mood"] == ""
         assert result["energy"] == 0.5
 
-    @patch("requests.post")
+    @patch("query_parser.requests.post")
     def test_parse_query_lowercases_genre_and_mood(self, mock_post):
         """parse_query should normalize genre and mood to lowercase."""
         mock_post.return_value = MagicMock(
@@ -284,7 +241,7 @@ class TestParseQuery:
                 "message": {"content": '{"genre": "LoFi", "mood": "Chill", "energy": 0.4}'}
             },
         )
-        parse_query = self._import_parse_query()
+        from query_parser import parse_query
         result = parse_query("chill lofi vibes")
 
         assert result["genre"] == "lofi"
