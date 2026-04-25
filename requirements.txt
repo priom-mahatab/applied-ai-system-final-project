@@ -3,3 +3,4 @@ pytest
 streamlit
 chromadb
 anthropic
+python-dotenv
