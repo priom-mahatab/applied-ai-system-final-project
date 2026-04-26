@@ -16,3 +16,7 @@ venv/
 
 # Pytest cache
 .pytest_cache/
+
+# Data and chroma files
+data/chroma/
+tests/data/
