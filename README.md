@@ -202,8 +202,6 @@ Running everything locally with Ollama also reframed what "AI-powered" means. A 
 >
 > The walkthrough shows three end-to-end queries: a chill late-night coding request, a high-energy workout query, and a vague mood-based request. Each demonstrates the interpreted preferences, retrieved candidates, and final ranked results with explanations.
 
-Screenshots are available in the [`/assets`](assets/) folder.
-
 ---
 
 ## Project Structure
