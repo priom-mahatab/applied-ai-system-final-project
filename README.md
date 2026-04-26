@@ -198,7 +198,7 @@ Running everything locally with Ollama also reframed what "AI-powered" means. A 
 
 ## Demo
 
-> 📹 **[Loom walkthrough — add your link here]**
+> 📹 **[[Loom walkthrough](https://www.loom.com/share/c6072fba93ef43c3a0c4ded3711aafd3)]**
 >
 > The walkthrough shows three end-to-end queries: a chill late-night coding request, a high-energy workout query, and a vague mood-based request. Each demonstrates the interpreted preferences, retrieved candidates, and final ranked results with explanations.
 
